@@ -28,7 +28,7 @@ execution: # 共享的执行相关配置
     provider: "mt5" # 明确执行引擎类型
     terminal_path: "C:/Program Files/EBC Financial Group Cayman MT5 Terminal/terminal64.exe" # EBC 账户信息
     login: 1421891             # EBC 账户信息
-    # password: "Lsj@18519750105" # !!! 强烈建议使用环境变量或 Secrets Manager !!!
+    # password: "123@1231230105" # !!! 强烈建议使用环境变量或 Secrets Manager !!!
     # 安全修改：请将您的 MT5 密码设置在名为 MT5_PASSWORD 的环境变量中
     # 读取环境变量的逻辑需要在连接 MT5 的代码中实现 (例如使用 os.getenv('MT5_PASSWORD'))
     password: ""  # 留空，在代码中通过环境变量读取
