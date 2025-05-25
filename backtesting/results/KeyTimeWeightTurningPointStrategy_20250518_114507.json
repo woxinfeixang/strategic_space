@@ -1,0 +1,31 @@
+{
+    "strategy_name": "KeyTimeWeightTurningPointStrategy",
+    "backtest_run_config": {
+        "start_date": "2024-10-01",
+        "end_date": "2025-05-01",
+        "initial_capital": 100000,
+        "symbols": [],
+        "symbols_backtested": [],
+        "data_granularity": "M1",
+        "primary_timeframe": "M30",
+        "data_padding_days": 30
+    },
+    "strategy_params_used": {},
+    "results": {
+        "initial_cash": 100000,
+        "final_equity": "100000",
+        "total_return": "0",
+        "total_trades": 0,
+        "sharpe_ratio": 0,
+        "max_drawdown": 0,
+        "win_rate": 0,
+        "profit_factor": 0,
+        "annual_return": 0,
+        "error": "StrategyInitializationError: Strategy module path for 'KeyTimeWeightTurningPointStrategy' is not configured under 'backtest.engine.strategy_module_path'.",
+        "status": "failed",
+        "strategy_name": "KeyTimeWeightTurningPointStrategy",
+        "backtest_id": "KeyTimeWeightTurningPointStrategy_20250518114507298652",
+        "quantstats_metrics": "Error during backtest execution, no metrics calculated.",
+        "trades": []
+    }
+}

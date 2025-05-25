@@ -1,0 +1,86 @@
+---
+# config/backtest_smoke_test.yaml
+# 用于冒烟测试的配置文件
+
+general_settings:
+  environment: "development"
+  start_date: "2025-05-01"  # 更新到有效的数据范围
+  end_date: "2025-05-14"
+  log_level: "DEBUG"
+  log_to_file: true
+  log_filename_template: "backtest_smoke_test.log"
+  symbols: ["EURUSD"]
+  timeframes: ["M30", "M5"]
+  initial_capital: 100000
+
+backtest:
+  strategy_name: "ReverseCrossoverStrategy" # 当前测试策略
+  strategy_params:
+    ReverseCrossoverStrategy:
+      crossover_min_pips: 3
+      volume_boost: 1.1
+      retrace_max_wait_bars: 5
+      retrace_entry_buffer_pips: 1
+      entry_on_retrace: true # 启用回调进场
+      stop_loss_pips: 20
+      take_profit_pips: 40
+      event_driven_space_creation:
+        enabled: true
+        event_importance_threshold: 1 # 降低事件重要性阈值以获取更多事件
+
+  # 引擎配置
+  engine:
+    # 回测时间范围。
+    start_date: "2025-05-01"
+    end_date: "2025-05-14"
+    # 数据设置
+    data_timeframe: "M30"
+    # 预加载数据设置
+    preload_timeframes:
+      - "M30"
+      - "M5"
+  
+  # 初始资金
+  cash: 100000
+  # 佣金设置
+  commission_fixed: 0.0
+  commission_percent: 0.0001
+  # 滑点设置
+  slippage_points: 1
+
+# 结果分析器参数
+analyzer:
+  # 风险设置
+  risk_free_rate: 0.02
+  # 图表输出设置
+  plot_results: true
+  plot_save_path: "output/backtest_plots"
+  # 报告输出设置
+  report_save_path: "output/backtest_reports"
+  report_format: "html"
+
+# 风险管理器配置
+risk_manager:
+  type: "NewFixedFractional" # 指定风险管理器类型
+  params:
+    risk_per_trade_percentage: "0.05" # 每次交易风险占账户净值的百分比 (例如 0.05 = 5%)
+    default_contract_size: "100000"   # 默认合约大小 (例如外汇标准手)
+    min_volume: "0.01"                # 最小下单手数
+    volume_precision: 2               # 手数精度 (小数点后位数)
+
+space_definition:
+  forward_bars: 6             # 定义博弈空间向前看的K线条数 (基于M30)
+  boundary_percentile: 90   # 博弈空间边界的百分位数
+  min_space_pips: 20          # 最小空间大小 (pips)
+
+# 新增事件货币到交易品种的映射
+event_mapping:
+  currency_to_symbol:
+    USD: EURUSD
+    EUR: EURUSD
+    GBP: GBPUSD
+    JPY: USDJPY
+    AUD: AUDUSD
+    CAD: USDCAD
+    NZD: NZDUSD
+    CHF: USDCHF

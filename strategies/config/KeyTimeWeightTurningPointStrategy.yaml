@@ -1,0 +1,15 @@
+# strategies/config/KeyTimeWeightTurningPointStrategy.yaml
+# KeyTimeWeightTurningPointStrategy 的特定参数
+
+ktwtp_params:
+  key_time_hours_after_event: [1, 3, 5, 8, 12, 18, 24, 36, 48] # 事件后多少小时视为关键时间
+  use_space_boundaries_as_turning_points: true # 是否使用空间边界作为拐点
+  confirm_with_m5_m15: false # 是否启用 M5/M15 周期确认
+  m5_m15_lookback: 6 # M5/M15 确认回看 K 线数量
+
+# 继承自 ExhaustionStrategy 的参数 (用于反转信号判断)
+exhaustion_checker_params:
+  exhaustion_lookback: 2 # 检查反转形态的回看 K 线数量 (例如 Pin Bar/吞没)
+  stop_loss_pip_buffer: 5 # 止损设置在反转形态高/低点之外的缓冲点数
+  take_profit_target: 'opposite_boundary' # 止盈目标: 'opposite_boundary', 'fixed_rr', 'none'
+  fixed_rr_ratio: 2.0 # 如果 take_profit_target = 'fixed_rr'，使用的盈亏比 

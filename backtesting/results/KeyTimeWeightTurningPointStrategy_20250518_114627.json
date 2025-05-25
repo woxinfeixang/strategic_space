@@ -1,0 +1,37 @@
+{
+    "strategy_name": "KeyTimeWeightTurningPointStrategy",
+    "backtest_run_config": {
+        "start_date": "2024-10-01",
+        "end_date": "2024-10-03",
+        "initial_capital": 100000,
+        "symbols": [
+            "EURUSD",
+            "GBPUSD"
+        ],
+        "symbols_backtested": [
+            "EURUSD",
+            "GBPUSD"
+        ],
+        "data_granularity": "M1",
+        "primary_timeframe": "M30",
+        "data_padding_days": 30
+    },
+    "strategy_params_used": {},
+    "results": {
+        "initial_cash": 100000,
+        "final_equity": "100000",
+        "total_return": "0",
+        "total_trades": 0,
+        "sharpe_ratio": 0,
+        "max_drawdown": 0,
+        "win_rate": 0,
+        "profit_factor": 0,
+        "annual_return": 0,
+        "error": "Runtime error in strategy loop at 2024-10-01 00:00:00+00:00: name 'num_invalidated' is not defined",
+        "status": "failed",
+        "strategy_name": "KeyTimeWeightTurningPointStrategy",
+        "backtest_id": "KeyTimeWeightTurningPointStrategy_20250518114626991471",
+        "quantstats_metrics": "Error during backtest execution, no metrics calculated.",
+        "trades": []
+    }
+}

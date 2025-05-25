@@ -1,0 +1,119 @@
+# market_price_data/config/updater.yaml
+# 市场数据更新器特定配置
+
+# 注意：共享的 MT5 连接信息 (用于执行交易的那个) 应从 common.yaml 获取。
+# --- 方案 A: 移除独立的数据源 MT5 配置，假设更新器也使用 common.yaml 的 execution.mt5 ---
+# data_source_mt5: 
+#   provider: \"mt5\"
+#   terminal_path: null 
+#   login: 51026378
+#   password: \"VjFXZ@9k\" 
+#   server: \"MetaQuotes-Demo\"
+#   timeout: 60
+
+# --- 历史数据更新相关 --- 
+historical:
+  enabled: true # 添加启用标志
+  symbols: # 需要更新的品种列表（按照MT5终端中显示的品种更新）
+    - AUDJPY
+    - AUDUSD
+    - D30EUR
+    - EURJPY
+    - EURUSD
+    - GBPJPY
+    - GBPUSD
+    - NZDUSD
+    - SPXUSD
+    - TSLA.OQ
+    - USDCAD
+    - USDCHF
+    - USDJPY
+    - XAGUSD
+    - XAUUSD
+    - XBRUSD
+    - XTIUSD
+  timeframes: # 需要更新的时间周期
+    - M1
+    - M5
+    - M15
+    - M30
+    - H1
+    - H4
+    - D1
+  # 移动 history 配置到这里
+  start_date: "2024-10-01" # 获取历史数据的起始日期
+  batch_size_days: 30 # 每次请求历史数据的时间跨度 (天)
+  delay_between_requests_ms: 500 # 请求之间的延迟 (毫秒)
+  # 添加代码期望的路径模式 (相对于 common.paths.data_dir)
+  data_directory_pattern: "historical/{symbol}" 
+  filename_pattern: "{symbol}_{timeframe_lower}.csv"
+  # 添加其他历史数据参数
+  default_start_offsets: # 默认回溯时间 (如果文件不存在)
+    M1: "30d" 
+    M5: "90d"
+    M15: "180d"
+    M30: "1y"
+    H1: "2y"
+    H4: "5y"
+    D1: "10y"
+  verify_integrity: true
+  retry_attempts: 3
+  retry_delay_seconds: 60
+
+# --- 实时数据更新相关 ---
+realtime:
+  enabled: true # 添加启用标志
+  symbols: # 需要更新的品种列表（按照MT5终端中显示的品种更新）
+    - AUDJPY
+    - AUDUSD
+    - D30EUR
+    - EURJPY
+    - EURUSD
+    - GBPJPY
+    - GBPUSD
+    - NZDUSD
+    - SPXUSD
+    - TSLA.OQ
+    - USDCAD
+    - USDCHF
+    - USDJPY
+    - XAGUSD
+    - XAUUSD
+    - XBRUSD
+    - XTIUSD
+  timeframes: # 需要更新的时间周期 (与 historical 相同，也可以不同)
+    - M1
+    - M5
+    - M15
+    - M30
+    - H1
+  # 移动 realtime 配置到这里
+  update_interval_seconds: 60 # 检查实时价格的间隔 (秒)
+  # poll_interval_seconds: 1 # <--- Remove this line
+  # Add the new interval settings below
+  poll_intervals: # Added this dictionary
+    M1: 15   # Poll M1 every 15 seconds
+    M5: 30   # Poll M5 every 30 seconds
+    M15: 60  # Poll M15 every 60 seconds
+    M30: 120 # Poll M30 every 120 seconds (2 minutes)
+    H1: 300  # Poll H1 every 300 seconds (5 minutes)
+    # Add specific intervals for other timeframes if needed
+  default_poll_interval_seconds: 60 # Added this default value
+  fetch_bars_count: 100 # 每次获取的 K 线数量
+  # 添加代码期望的路径模式 (相对于 common.paths.data_dir)
+  data_directory_pattern: "realtime/{symbol}" 
+  filename_pattern: "{symbol}_{timeframe_lower}_realtime.csv" 
+  retry_attempts: 5
+  retry_delay_seconds: 10
+
+# --- 日志配置 (覆盖 common.yaml 中的默认行为，如果需要) ---
+logging:
+  # 为历史数据更新指定单独的日志文件名
+  history_log_filename: "market_data_history.log"
+  # 为实时数据更新指定单独的日志文件名
+  realtime_log_filename: "market_data_realtime.log"
+  # 其他 logging 配置 (如 level, format) 默认继承自 common.yaml
+  # 如果需要覆盖，可以在这里添加，例如：
+  # level: DEBUG
+
+# 注意：共享的日志配置等应从 common.yaml 继承 

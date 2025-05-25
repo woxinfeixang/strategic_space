@@ -1,0 +1,76 @@
+# config/common.yaml
+# 项目共享的基础配置文件
+
+paths:
+  data_dir: "data" # 相对于项目根目录
+  log_dir: "logs"
+  # 可以根据需要添加更多共享的基础路径
+  # market_data_dir: "${paths.data_dir}/market" # 示例插值
+  # calendar_data_dir: "${paths.data_dir}/calendar"
+
+logging:
+  level: DEBUG
+  format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  # 文件日志路径通常在代码中结合 log_dir 和模块名生成
+  # file_path: "${paths.log_dir}/app.log" # 示例
+  # --- 新增: 为策略调度器指定日志文件名 ---
+  orchestrator_log_filename: "strategy_orchestrator.log"
+  # --- 新增: 为回测模块指定日志文件名 ---
+  backtest_log_filename: "backtest.log"
+
+localization:
+  timezone: Asia/Shanghai
+  locale: zh_CN
+  # update_interval: 30 # 这个看起来更像应用逻辑，暂时不放在 common
+
+execution: # 共享的执行相关配置
+  mt5:     # 用于策略执行的 MT5 连接
+    provider: "mt5" # 明确执行引擎类型
+    terminal_path: "C:/Program Files/EBC Financial Group Cayman MT5 Terminal/terminal64.exe" # EBC 账户信息
+    login: 1421891             # EBC 账户信息
+    # password: "Lsj@18519750105" # !!! 强烈建议使用环境变量或 Secrets Manager !!!
+    # 安全修改：请将您的 MT5 密码设置在名为 MT5_PASSWORD 的环境变量中
+    # 读取环境变量的逻辑需要在连接 MT5 的代码中实现 (例如使用 os.getenv('MT5_PASSWORD'))
+    password: ""  # 留空，在代码中通过环境变量读取
+    server: "EBCFinancialGroupKY-Live01"   # EBC 账户信息
+    timeout: 30                # MT5 连接超时
+    deviation_points: 10       # 市价单默认滑点 (单位: points)
+    # magic_number: 67890      # 已移动到各策略自己的配置中(strategies/config/module.yaml)
+    # symbol_map: {}            # 符号映射 (如果需要) 
+
+# --- 新增: 底层处理脚本路径配置 ---
+scripts:
+  # 历史数据处理 (下载、解析、筛选、入库)
+  process_calendar:
+    path: "economic_calendar/economic_calendar_history/scripts/process_calendar.py"
+    # args: [] # 如果此脚本需要固定的基础参数，可以在这里添加
+
+  # 实时数据下载
+  download_investing_calendar:
+    path: "economic_calendar/economic_calendar_realtime/download_investing_calendar.py"
+    # args: []
+
+  # 通用筛选逻辑 (被实时工作流调用)
+  filter_main:
+    # path: "economic_calendar/main.py" # 旧路径，指向多功能脚本
+    path: "economic_calendar/tasks/filter_data_step.py" # 新路径，指向专用筛选步骤脚本
+    # args: ["--action", "filter"] # 可能需要传递默认动作参数，或者让调用者传递
+    args: [] # 工作流脚本会传递 --input-file 和 --output-file 等参数 
+
+# 事件映射配置 (Event Mapping Configuration)
+# 由 EventDrivenSpaceStrategy 基类使用
+event_mapping:
+  event_mappings: [] # 添加一个空的列表作为 event_mappings 的值
+  # currency_to_symbol: # KTWTP uses this, keep it if needed by specific strategies
+  #   EUR: EURUSD
+  #   USD: EURUSD
+  #   GBP: GBPUSD
+  #   JPY: USDJPY
+  #   AUD: AUDUSD
+  #   CAD: USDCAD
+  #   NZD: NZDUSD
+  #   CHF: USDCHF
+  # default_event_symbol: EURUSD # KTWTP uses this
+
+# 日志配置 (Logging Configuration)
+# ... existing code ... 

@@ -1,0 +1,7 @@
+# market_price_data/requirements.txt
+# Direct dependencies for the market_price_data module
+
+pandas>=1.5.0
+pytz>=2023.3
+omegaconf>=2.3.0
+MetaTrader5>=5.0.0 

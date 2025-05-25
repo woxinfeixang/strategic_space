@@ -1,0 +1,95 @@
+app_name: "StrategicSpaceBacktest"
+version: "1.0"
+description: "Configuration for backtesting trading strategies."
+
+# General application settings (can be overridden by environment or command line)
+general_settings:
+  environment: "development" # development, staging, production
+  # start_date: "2020-01-01" 
+  # end_date: "2023-12-31"
+  start_date: "2024-02-06" # 更新为与数据文件匹配的开始日期
+  end_date: "2024-02-10"   # 更新为合理的结束日期
+  log_level: "DEBUG" # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  log_to_file: true
+  log_filename_template: "backtest_smoke_test_rcs.log" # Will be saved in logs/
+  symbols: ["EURUSD"]
+  timeframes: ["M5"]
+  initial_capital: 10000
+
+# Backtest specific settings
+backtest:
+  # strategy_name: "YourStrategyName" # To be overridden or specified
+  strategy_name: "ReverseCrossoverStrategy"
+  # capital: 100000
+  # risk_per_trade: 0.01 # 1% of capital
+  # commission_per_trade: 0.0 # Fixed commission
+  # slippage_pips: 0.5
+
+  # 策略参数 - 直接在这里配置入口就能生效
+  strategy_params:
+    ReverseCrossoverStrategy:
+      entry_on_retrace: true
+      retrace_max_wait_bars: 5
+      retrace_entry_buffer_pips: 1
+
+  engine:
+    # start_date: ${general_settings.start_date} # Example of OmegaConf interpolation
+    # end_date: ${general_settings.end_date}
+    # symbols: ["EURUSD"]
+    # primary_timeframe: "m5" # Ensure this matches your strategy's primary analysis timeframe
+    
+    # Explicitly set for engine, overriding general_settings if needed or for clarity
+    start_date: "2024-02-06" # 更新为与数据文件匹配的开始日期
+    end_date: "2024-02-10"   # 更新为合理的结束日期
+    symbols: ["EURUSD"]
+    primary_timeframe: "m5"
+    # Path to the strategy module (e.g., "strategies.your_strategy_module")
+    strategy_module_path: "strategies.reverse_crossover_strategy"
+
+
+  data_provider:
+    type: "MarketDataProvider" # Could be "LiveDataStreamer" for live trading
+    # data_path: "data/historical" # Root path for historical data
+    # data_format: "csv" # csv, feather, etc.
+    # data_padding_days: 60 # Number of days before start_date to preload for indicators
+    data_padding_days: 0 # Updated: No padding as data starts sharply
+    # economic_calendar_db: "data/economic_calendar.db"
+
+  execution_engine:
+  parameters:
+    initial_capital: 10000
+
+strategy_settings:
+  params_file: "config/strategy_params/reverse_crossover_strategy.yaml"
+
+risk_settings:
+  risk_manager_type: "FixedLotSize"
+  params:
+    fixed_lot_size: 0.01
+
+execution_settings:
+  broker_type: "BacktestBroker"
+  slippage_model: "Fixed"
+  params:
+    slippage_pips: 0.2
+
+logging:
+  backtest_log_filename: "backtest_smoke_rcs.log"
+  log_dir: "logs"
+  level: "INFO"
+  console_level: "INFO"
+
+performance_settings:
+  metrics: ["SharpeRatio", "TotalReturn", "MaxDrawdown"]
+
+# 事件映射
+event_mapping:
+  event_mappings:
+    - event_name: "*"
+      symbols: ["EURUSD"]
+      impact_threshold: 1
+  currency_to_symbol:
+    USD: EURUSD
+    EUR: EURUSD
+    GBP: GBPUSD
+    JPY: USDJPY

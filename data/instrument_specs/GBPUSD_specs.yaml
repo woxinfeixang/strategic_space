@@ -1,0 +1,9 @@
+symbol: GBPUSD
+description: Great Britain Pound vs US Dollar
+digits: 5
+point: 0.00001
+trade_contract_size: 100000.0
+volume_min: 0.01
+volume_step: 0.01
+currency_base: GBP
+currency_profit: USD 

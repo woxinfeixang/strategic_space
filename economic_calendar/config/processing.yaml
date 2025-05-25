@@ -1,0 +1,247 @@
+# economic_calendar/config/processing.yaml
+# 经济数据处理工作流特定配置
+
+economic_calendar:
+  # 详细路径配置 (相对于 common.yaml 中定义的 data_dir)
+  paths:
+    raw_history_dir: "calendar/raw/history"       # 原始历史HTML存放目录
+    merged_raw_history_dir: "calendar/raw/history"
+    raw_live_dir: "calendar/raw/live"            # 原始实时HTML存放目录 (修改注释)
+    processed_history_dir: "calendar/processed/history"  # 处理后的历史数据存放目录 (仅存放中间 CSV)
+    processed_live_dir: "calendar/processed/live"       # <-- 添加处理后的实时数据中间目录
+    # processed_live_dir: "calendar/processed/live"       # README 中无此目录，注释掉
+    # filtered_dir: "calendar/filtered"            # 移除通用 filtered_dir，细化为 history 和 live
+    filtered_history_dir: "calendar/filtered/history" # 筛选后的历史数据存放目录 (最终 CSV 和 DB)
+    filtered_live_dir: "calendar/filtered/live"       # 筛选后的实时数据存放目录
+    # export_dir: "calendar/export"                # README 中无此目录，注释掉
+    db_dir: "calendar/filtered/history" # SQLite 数据库文件存放目录 (修改为符合最终筛选结果存放规范)
+
+  # 文件名配置
+  files:
+    # --- 历史数据相关 ---
+    processed_history_csv: "economic_calendar_history.csv" # 处理后历史数据的CSV文件名 (放在 processed_history_dir)
+    merged_raw_history_csv: "merged_raw_history.csv" # process_calendar.py 输出的合并原始文件名
+    
+    # --- 实时数据相关 ---
+    # 移除旧的 upcoming.csv，因为不再直接生成
+    # raw_live_csv: "upcoming.csv"                    # 原始实时数据CSV文件名 (放在 raw_live_dir)
+    raw_live_html: "realtime_calendar.html"         # <-- 新增：实时抓取的原始 HTML 文件名
+    processed_live_csv: "processed_live.csv"        # <-- 新增：处理实时 HTML 后生成的中间 CSV 文件名
+    
+    # --- 通用/最终输出 ---
+    filtered_csv_prefix: "filtered_"                # 筛选后的CSV文件名前缀 (例如 filtered_live.csv)
+    events_db: "economic_calendar.db"               # SQLite 数据库文件名 (放在 paths.db_dir)
+    # history_db: "economic_calendar.db"            # 可选：如果历史数据库文件名不同 (放在 processed_history_dir) # 通常与 events_db 一致
+
+  # 实时数据下载配置
+  download:
+    target_url: "https://cn.investing.com/economic-calendar/" # 明确添加 URL 配置
+    days_ahead: 7
+    retry_attempts: 3
+    retry_delay_seconds: 30
+    timeout_seconds: 60
+    user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    copy_to_mt5: true # 这个开关控制是否执行下面的复制逻辑
+
+  # 筛选通用配置
+  filtering:
+    min_importance: 2
+    importance_3star_force_keep: false
+    add_market_open: true
+    time_filter_enabled: false
+    start_time: "08:00"
+    end_time: "22:00"
+    use_keywords_filter: true  # 启用关键词筛选
+
+  # 货币列表
+  currencies:
+    - "USD"
+    - "EUR"
+    - "GBP"
+    - "JPY"
+    - "AUD"
+    - "CAD"
+    - "CNY"
+    - "CHF"
+    - "XAU"
+    - "XTI"
+    - "XBR"
+
+  # 关键词配置
+  keywords_config:
+    CRITICAL_EVENTS:
+      - "利率决议"
+      - "央行决议"
+      - "FOMC"
+      - "GDP"
+      - "非农就业"
+      - "消费者物价指数"
+      - "CPI"
+      - "通胀"
+      - "就业报告"
+      - "PMI"
+    IMPORTANT_SPEAKERS:
+      - "鲍威尔"
+      - "Powell"
+      - "拉加德"
+      - "Lagarde"
+      - "贝利"
+      - "Bailey"
+      - "植田和男"
+      - "Ueda"
+    HIGH_IMPACT_KEYWORDS:
+      - "非农"
+      - "PMI"
+      - "CPI"
+      - "利率决议"
+      - "央行会议"
+      - "制造业"
+      - "服务业"
+      - "零售销售"
+      - "失业率"
+      - "就业"
+      - "通胀"
+      - "PPI"
+      - "生产者物价指数"
+      - "PCE"
+      - "个人消费支出"
+      - "贸易帐"
+      - "贸易差额"
+      - "议息"
+      - "货币政策"
+      - "利率"
+      - "讲话"
+      - "发言"
+      - "评论"
+      - "财长会议"
+      - "清算银行"
+    CURRENCY_SPECIFIC_2STAR_KEYWORDS:
+      USD:
+        - "美国"
+        - "美联储"
+        - "ISM"
+        - "就业市场"
+        - "原油库存"
+        - "API"
+        - "EIA"
+        - "消费者信贷"
+        - "褐皮书"
+        - "密歇根"
+        - "新屋开工"
+        - "成屋销售"
+        - "营建许可"
+        - "未决房屋"
+        - "初请"
+        - "续请"
+        - "谘商会"
+        - "消费者信心"
+        - "耐用品订单"
+        - "ADP"
+        - "资本净流入"
+        - "TIC"
+        - "纽约联储"
+        - "制造业指数"
+        - "财政预算"
+      EUR:
+        - "欧元区"
+        - "欧央行"
+        - "德国"
+        - "法国"
+        - "ZEW"
+        - "IFO"
+        - "ECB"
+        - "新闻发布会"
+        - "月度报告"
+        - "IH"
+        - "M3"
+        - "货币供应"
+        - "服务业信心"
+      GBP:
+        - "英国"
+        - "英央行"
+        - "BOE"
+        - "PMI"
+        - "Halifax"
+        - "房价指数"
+        - "CBI"
+        - "调查"
+      JPY:
+        - "日本"
+        - "日央行"
+        - "短观"
+        - "Tankan"
+        - "领先指标"
+      XAU:
+        - "美国"
+        - "美联储"
+        - "加拿大"
+      XTI:
+        - "原油"
+        - "库存"
+        - "API"
+        - "EIA"
+        - "美国"
+      XBR:
+        - "原油"
+        - "库存"
+        - "布伦特"
+      CAD:
+        - "加拿大"
+        - "加元"
+        - "利率"
+        - "就业"
+      AUD:
+        - "澳大利亚"
+        - "澳储行"
+      CNY:
+        - "中国"
+        - "央行"
+      CHF:
+        - "瑞士"
+        - "瑞央行"
+
+  # 导出配置
+  export:
+    formats:
+      - "csv"
+      - "db"
+    csv_encoding: "utf-8"
+    copy_to_mt5: ${economic_calendar.download.copy_to_mt5} # 引用上面的开关，注意路径要跟着改
+
+  # MT5 配置 (仅用于将筛选后的事件复制到MT5目录)
+  mt5_data_copy:
+    copy_enabled: ${economic_calendar.export.copy_to_mt5} # 引用上面的开关，注意路径要跟着改
+    active_profile: "EBC" # 当前要复制到的 MT5 配置 (从下面 profiles 中选择)
+    profiles:
+      # EBC Financial Group配置
+      EBC:
+        # server: "EBCFinancial-Live" # 复制数据通常不需要 server/login/pass
+        # login: 1234567
+        # password: "your_password_here"
+        executable_path: "C:/Program Files/MetaTrader 5/terminal64.exe" # 这个可能也不需要?
+        data_directory: "C:/Program Files/MetaTrader 5/MQL5/Files" # 目标 MT5 Files 目录
+
+      # IC Markets Global配置
+      ICMarkets:
+        # server: "ICMarketsSC-MT5"
+        # login: 7654321
+        # password: "your_password_here"
+        executable_path: "C:/Program Files/MetaTrader 5/terminal64.exe"
+        data_directory: "C:/Program Files/MetaTrader 5 IC Markets Global/MQL5/Files" # 示例：不同的路径
+
+# 注意：共享的日志配置等应从 common.yaml 继承
+
+# --- 日志配置 ---
+logging:
+  # 为经济日历模块指定日志文件名
+  calendar_log_filename: "economic_calendar.log"
+  # --- 新增：为下载脚本指定日志文件名 ---
+  downloader_log_filename: "economic_calendar_downloader.log"
+  # --- 新增：为历史工作流指定日志文件名 ---
+  history_workflow_log_filename: "history_workflow.log"
+  # --- 新增：为实时工作流指定日志文件名 ---
+  realtime_workflow_log_filename: "realtime_workflow.log"
+  # --- 新增：为筛选步骤指定日志文件名 ---
+  filter_log_filename: "calendar_filter.log"
+  # -------------------------------------
+  # 其他日志设置 (level, format) 继承自 common.yaml 

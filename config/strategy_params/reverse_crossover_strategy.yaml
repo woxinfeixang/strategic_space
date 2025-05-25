@@ -1,0 +1,47 @@
+# Parameters for EventDrivenSpaceStrategy (parent)
+primary_timeframe: "M5"
+secondary_timeframes: []
+
+event_driven_space_creation:
+  enabled: true
+  event_importance_threshold: 2
+  space_config:
+    default:
+      min_event_strength: 0.5
+      max_event_age_minutes: 120
+      space_calculation_window_minutes: 60
+      space_invalidation_window_minutes: 240
+      min_space_height_pips: 10
+      max_space_height_pips: 100
+      boundary_touch_patience_minutes: 30
+      creation_reason_filter: ["initial_move", "sustained_move"]
+      invalidation_conditions:
+        max_age: true
+        significant_breakout: true
+        new_conflicting_event: true
+
+event_time_buffer_minutes: 5
+event_mapping:
+  default_lookback_days: 7
+  currency_to_symbol:
+    USD: "EURUSD"
+    EUR: "EURUSD"
+
+logging_level: "INFO"
+
+# Parameters for ReverseCrossoverStrategy (child)
+active: true
+description: "Reverse Crossover Strategy for smoke test"
+crossover_min_pips: 3
+volume_boost: 1.1
+retrace_max_wait_bars: 5
+retrace_entry_buffer_pips: 1
+entry_on_retrace: false
+retrace_sl_use_entry_bar_extremum: true
+retrace_sl_extremum_buffer_pips: 2
+stop_loss_pips: 20
+take_profit_pips: 40
+use_space_sl_tp: true
+sl_buffer_pips: 2
+tp_buffer_pips: 2
+allow_multiple_entries_per_space: false 

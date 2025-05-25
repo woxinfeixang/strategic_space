@@ -1,0 +1,103 @@
+---
+# backtesting/config/backtest.yaml
+# 回测模块特定配置
+
+backtest:
+  strategy_name: KeyTimeWeightTurningPointStrategy
+  strategy_params:
+    KeyTimeWeightTurningPointStrategy:
+      ktwtp_params:
+        key_time_hours_after_event: [1, 3, 5]
+        use_space_boundaries_as_turning_points: true
+        turning_point_buffer_pips: 10
+        confirm_with_m5_m15: false
+        m5_m15_lookback: 6
+        stop_loss_buffer_pips: 15
+        take_profit_target: 'opposite_boundary'
+        risk_reward_ratio: 1.5
+      event_mapping:
+        currency_to_symbol:
+          USD: EURUSD
+          EUR: EURUSD
+          GBP: GBPUSD
+        default_event_symbol: EURUSD
+      primary_timeframe: "M30"
+
+    ExhaustionStrategy:
+      primary_timeframe: "M30"
+
+  # 引擎配置
+  engine:
+    # 回测时间范围。
+    start_date: "2024-10-01"
+    end_date: "2025-05-01"
+    # 数据设置
+    data_timeframe: "M30"
+    # 预加载数据设置
+    preload_timeframes:
+      - "M30"
+  
+  # 初始资金
+  cash: 100000
+  # 佣金设置
+  # commission_fixed: 0.0
+  # commission_percent: 0.0001
+  # 滑点设置
+  # slippage_points: 1
+
+# 结果分析器参数
+analyzer:
+  # 风险设置
+  risk_free_rate: 0.02
+  # 图表输出设置
+  plot_results: true
+  plot_save_path: "output/backtest_plots"
+  # 报告输出设置
+  report_save_path: "output/backtest_reports"
+  report_format: "html"
+
+# 回测数据源配置
+# 注意：回测通常直接读取历史数据文件，路径应能从 common.yaml 继承或在此处明确指定
+# data_source:
+#   historical_data_dir: "${paths.data_dir}/historical" # 示例引用共享路径
+
+# 注意：共享的配置（如日志、基础路径）应从 common.yaml 继承 
+
+# --- 添加经济日历数据库路径 ---
+economic_calendar:
+  paths:
+    # 指向正确的事件数据库文件路径和名称
+    database_file: "data/calendar/filtered/history/economic_calendar.db" # <-- 更新为用户提供的正确路径
+
+# --- 添加执行引擎特定配置 ---
+execution_engine:
+  sandbox: # Sandbox 特有的配置
+    # initial_cash: 100000 # 可以覆盖 backtest.cash，如果需要分开设置
+    commission_per_trade: 1.5 # 每次交易的固定佣金 (示例值)
+
+# --- 添加风险管理器配置 ---
+risk_manager:
+  type: "NewFixedFractional" # 指定风险管理器类型
+  params:
+    risk_per_trade_percentage: "0.05" # 每次交易风险占账户净值的百分比 (例如 0.05 = 5%)
+    default_contract_size: "100000"   # 默认合约大小 (例如外汇标准手)
+    min_volume: "0.01"                # 最小下单手数
+    volume_precision: 2               # 手数精度 (小数点后位数)
+
+space_definition:
+  forward_bars: 6             # 定义博弈空间向前看的K线条数 (基于M30)
+  boundary_percentile: 90   # 博弈空间边界的百分位数 (原为95)
+  min_space_pips: 20          # 最小空间大小 (pips)
+
+# 新增事件货币到交易品种的映射
+event_mapping:
+  currency_to_symbol:
+    USD: EURUSD
+    EUR: EURUSD
+    GBP: GBPUSD
+    JPY: USDJPY
+    AUD: AUDUSD
+    CAD: USDCAD
+    NZD: NZDUSD
+    CHF: USDCHF
+    CNY: USDCNH # 假设CNY事件映射到USDCNH

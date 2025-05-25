@@ -1,0 +1,33 @@
+{
+    "strategy_name": "ReverseCrossoverStrategy",
+    "backtest_run_config": {
+        "start_date": "2023-01-02",
+        "end_date": "2023-01-03",
+        "initial_capital": 10000,
+        "symbols": [
+            "EURUSD"
+        ],
+        "symbols_backtested": [],
+        "data_granularity": "M1",
+        "primary_timeframe": "M5",
+        "data_padding_days": 30
+    },
+    "strategy_params_used": {},
+    "results": {
+        "initial_cash": 10000,
+        "final_equity": "100000",
+        "total_return": "9",
+        "total_trades": 0,
+        "sharpe_ratio": 0,
+        "max_drawdown": 0,
+        "win_rate": 0,
+        "profit_factor": 0,
+        "annual_return": 0,
+        "error": "Data loading failed.",
+        "status": "failed",
+        "strategy_name": "ReverseCrossoverStrategy",
+        "backtest_id": "ReverseCrossoverStrategy_20250516222715250301",
+        "quantstats_metrics": "Error during backtest execution, no metrics calculated.",
+        "trades": []
+    }
+}

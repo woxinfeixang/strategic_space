@@ -1,0 +1,86 @@
+event_mappings:
+  - id: "us_nfp" # Unique ID for this rule
+    country_codes: ["US"] # List of applicable country codes
+    title_keywords: ["Non-Farm Payrolls", "NFP", "非农就业人数"]
+    impacted_currency: "USD"
+    # Logic for determining if the event outcome is "good" or "bad" for the currency.
+    # A=Actual, F=Forecast, P=Previous. Comparison operators can be used.
+    # Example: "A > F" means actual greater than forecast is considered "good".
+    # For unemployment, "A < F" would be "good".
+    outcome_is_good_condition: "A > F" 
+    symbols_and_reactions:
+      - symbol: "XAUUSD"
+        direction_if_good: "SELL" # If USD is good, XAUUSD goes down
+        direction_if_bad: "BUY"
+      - symbol: "EURUSD"
+        direction_if_good: "SELL"
+        direction_if_bad: "BUY"
+      - symbol: "USDJPY"
+        direction_if_good: "BUY" # If USD is good, USDJPY goes up
+        direction_if_bad: "SELL"
+
+  - id: "us_cpi_mom" # CPI m/m
+    country_codes: ["US"]
+    title_keywords: ["CPI m/m", "消费者物价指数月率"]
+    # Ensure keywords are specific enough to avoid conflict with y/y
+    impacted_currency: "USD"
+    outcome_is_good_condition: "A > F" # Higher than expected inflation -> USD good (rate hike expectations)
+    symbols_and_reactions:
+      - symbol: "XAUUSD"
+        direction_if_good: "SELL"
+        direction_if_bad: "BUY"
+      - symbol: "EURUSD"
+        direction_if_good: "SELL"
+        direction_if_bad: "BUY"
+
+  - id: "us_interest_rate_decision"
+    country_codes: ["US"]
+    title_keywords: ["Interest Rate Decision", "Fed Funds Rate", "联邦基金利率目标"]
+    impacted_currency: "USD"
+    outcome_is_good_condition: "A > P" # Actual rate higher than previous rate -> USD good
+    symbols_and_reactions:
+      - symbol: "XAUUSD"
+        direction_if_good: "SELL"
+        direction_if_bad: "BUY"
+      - symbol: "EURUSD"
+        direction_if_good: "SELL"
+        direction_if_bad: "BUY"
+
+  - id: "ea_interest_rate_decision" # Euro Area
+    country_codes: ["EA", "EZ"] # Eurozone, Euro Area
+    title_keywords: ["Interest Rate Decision", "Main Refinancing Rate", "欧洲央行主要再融资利率"]
+    impacted_currency: "EUR"
+    outcome_is_good_condition: "A > P"
+    symbols_and_reactions:
+      - symbol: "EURUSD"
+        direction_if_good: "BUY"
+        direction_if_bad: "SELL"
+      - symbol: "EURJPY"
+        direction_if_good: "BUY"
+        direction_if_bad: "SELL"
+      - symbol: "XAUUSD"
+        direction_if_good: "SELL" 
+        direction_if_bad: "BUY"
+
+  - id: "gb_interest_rate_decision" # Great Britain
+    country_codes: ["GB"]
+    title_keywords: ["Interest Rate Decision", "Official Bank Rate", "英国央行利率决议"]
+    impacted_currency: "GBP"
+    outcome_is_good_condition: "A > P"
+    symbols_and_reactions:
+      - symbol: "GBPUSD"
+        direction_if_good: "BUY"
+        direction_if_bad: "SELL"
+      - symbol: "EURGBP"
+        direction_if_good: "SELL" # GBP good -> EURGBP down
+        direction_if_bad: "BUY"
+
+  - id: "us_pmi_manufacturing"
+    country_codes: ["US"]
+    title_keywords: ["Manufacturing PMI", "制造业PMI"]
+    impacted_currency: "USD"
+    outcome_is_good_condition: "A > F" # Higher PMI is good
+    symbols_and_reactions:
+      - symbol: "USDJPY"
+        direction_if_good: "BUY"
+        direction_if_bad: "SELL" 

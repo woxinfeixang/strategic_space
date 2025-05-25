@@ -1,0 +1,12 @@
+# strategies/requirements.txt
+# 本文件列出了 `strategies` 模块直接依赖的第三方库。
+# 项目完整的依赖列表请参见根目录下的 requirements.txt。
+
+pandas>=1.5.0
+numpy>=1.23.0
+# MetaTrader5 # 如果项目需要与 MT5 交互，取消注释此行并确保已安装 
+MetaTrader5>=5.0.0
+# 数据处理库
+omegaconf>=2.3.0
+pytz>=2023.3
+# 参考主 requirements.txt 获取完整依赖列表 

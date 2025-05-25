@@ -1,0 +1,107 @@
+---
+# config/backtest_test_all.yaml
+# u7528u4e8eu6d4bu8bd5u6240u6709u7b56u7565u7684u914du7f6eu6587u4ef6
+
+general_settings:
+  environment: "development"
+  start_date: "2024-09-15"
+  end_date: "2024-10-15"
+  log_level: "DEBUG"
+  log_to_file: true
+  log_filename_template: "backtest_test_all.log"
+  symbols: ["EURUSD", "USDJPY", "GBPUSD"]
+  timeframes: ["M30", "M5"]
+  initial_capital: 100000
+
+backtest:
+  strategy_name: "ReverseCrossoverStrategy" # u5f53u524du6d4bu8bd5u7b56u7565uff0cu53efu66ffu6362u4e3au5176u4ed6u7b56u7565
+  strategy_params:
+    ReverseCrossoverStrategy:
+      crossover_min_pips: 3
+      volume_boost: 1.1
+      retrace_max_wait_bars: 5
+      retrace_entry_buffer_pips: 1
+      entry_on_retrace: true # u542fu7528u56deu8c03u8fdbu573a
+      stop_loss_pips: 20
+      take_profit_pips: 40
+      event_driven_space_creation:
+        enabled: true
+        event_importance_threshold: 1 # u964du4f4eu4e8bu4ef6u91cdu8981u6027u9608u503cu4ee5u83b7u53d6u66f4u591au4e8bu4ef6
+
+    KeyTimeWeightTurningPointStrategy:
+      ktwtp_params:
+        key_time_hours_after_event: [1, 3, 5]
+        use_space_boundaries_as_turning_points: true
+        turning_point_buffer_pips: 10
+        confirm_with_m5_m15: false
+        m5_m15_lookback: 6
+        stop_loss_buffer_pips: 15
+        take_profit_target: 'opposite_boundary'
+        risk_reward_ratio: 1.5
+        use_natural_retracement_tp: true
+        natural_retracement_levels: [0.382, 0.5, 0.618]
+        use_node_tp: true
+        node_proximity_buffer_pips: 5
+
+    ExhaustionStrategy:
+      primary_timeframe: "M30"
+      exhaustion_params:
+        confirm_with_m5_rsi: true
+        pinbar_min_wick_to_body_ratio: 1.5
+        engulfing_min_body_size_pips: 5
+
+    SpaceTimeResonanceStrategy:
+      resonance_settings:
+        key_time_enabled: true
+        key_time_hours_after_event: [1, 3, 5]
+        fixed_key_times: 
+          - {start: "08:00", end: "09:00", tz: "Europe/London", days_of_week: [0,1,2,3,4]}
+          - {start: "14:30", end: "15:30", tz: "America/New_York", days_of_week: [0,1,2,3,4]}
+        s2_max_wait_bars: 5
+
+  engine:
+    start_date: "2024-09-15"
+    end_date: "2024-10-15"
+    symbols: ["EURUSD", "USDJPY", "GBPUSD"]
+    primary_timeframe: "M30"
+    strategy_module_path: "strategies.reverse_crossover_strategy"
+  
+  cash: 100000
+
+execution_engine:
+  sandbox:
+    commission_per_trade: 1.5
+
+risk_manager:
+  type: "NewFixedFractional"
+  params:
+    risk_per_trade_percentage: "0.05"
+    default_contract_size: "100000"
+    min_volume: "0.01"
+    volume_precision: 2
+
+space_definition:
+  forward_bars: 6
+  boundary_percentile: 90
+  min_space_pips: 20
+
+event_mapping:
+  currency_to_symbol:
+    USD: EURUSD
+    EUR: EURUSD
+    GBP: GBPUSD
+    JPY: USDJPY
+  event_mappings:
+    - event_name: "*"
+      symbols: ["EURUSD", "USDJPY", "GBPUSD"]
+      impact_threshold: 1
+
+logging:
+  backtest_log_filename: "backtest_test_all.log"
+  log_dir: "logs"
+  level: "INFO"
+  console_level: "INFO"
+
+data_provider:
+  type: "MarketDataProvider"
+  data_padding_days: 30

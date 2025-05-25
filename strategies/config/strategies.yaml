@@ -1,0 +1,205 @@
+# strategies/config/strategies.yaml
+# 策略模块特定配置
+
+# 策略调度器 (Orchestrator) 相关
+orchestrator:
+  enabled_strategies:
+    # 控制哪些策略会被加载和运行, True 表示启用
+    EventDrivenSpaceStrategy: true
+    ReverseCrossoverStrategy: true
+    ExhaustionStrategy: true
+    KeyTimeWeightTurningPointStrategy: true
+    SpaceTimeResonanceStrategy: true
+  run_interval_seconds: 300 # 调度器运行周期间隔 (例如 5 分钟)
+
+# 执行引擎类型 (用于选择加载哪个引擎)
+# 可选值: "mt5", "sandbox"
+# 注意：具体的 MT5 连接信息在 common.yaml 中配置
+execution_engine_type: "mt5"
+
+# 新增: 风险管理器配置
+risk_manager:
+  type: "FixedFractional" # 选择风险管理器类型 (FixedFractional, FixedAmount 等)
+  params:
+    risk_per_trade_percent: 0.01 # 例如，每次交易风险限制为账户净值的 1%
+    min_lot_size: 0.01 # 最小允许手数
+    lot_step: 0.01 # 手数步进
+
+# 新增: 信号聚合器配置
+signal_aggregator:
+  enabled: true # 是否启用信号聚合功能
+  resonance_threshold: 2.0 # 共振触发阈值
+  resonance_time_window_minutes: 120 # 共振信号有效时间窗口（分钟）
+  max_signal_age_hours: 12 # 信号最大保留时间（小时）
+  confidence_threshold: 0.3 # 最低信号置信度阈值
+  # 各策略权重配置
+  strategy_weights:
+    EventDrivenSpaceStrategy: 1.0
+    ReverseCrossoverStrategy: 0.8
+    ExhaustionStrategy: 0.8
+    KeyTimeWeightTurningPointStrategy: 1.0
+    SpaceTimeResonanceStrategy: 1.0
+    Default: 0.7 # 默认策略权重
+
+# 新增: 关键时间检测器配置
+key_time_detector:
+  enabled: true # 是否启用关键时间检测功能
+  # 事件后关键时间点配置（小时）
+  key_time_hours_after_event: [1, 2, 4, 8, 12, 24]  
+  # 自定义关键时间设置
+  fixed_key_times:
+    - name: "欧盘开盘"
+      start: "08:00"
+      end: "09:00"
+      tz: "Europe/London"
+      days_of_week: [0, 1, 2, 3, 4]  # 周一至周五
+    - name: "美盘开盘"
+      start: "14:30" 
+      end: "15:30"
+      tz: "America/New_York"
+      days_of_week: [0, 1, 2, 3, 4]  # 周一至周五
+  # 关键时间窗口大小（分钟）
+  key_time_window_minutes: 60
+
+# 各个策略的特定参数
+strategy_params:
+  # P0核心策略配置
+  EventDrivenSpaceStrategy:
+    # 基本策略参数
+    magic_number: 67890
+    log_level: "INFO" # 日志级别控制
+
+    # 核心策略行为参数
+    initial_impulse_threshold_pips: 15.0 # 触发空间的最小脉冲点数 (之前讨论是10或15，暂定15)
+    space_buffer_pips: 3.0             # 默认空间边界缓冲点数 (之前讨论是2或3，暂定3)
+    max_active_spaces_per_symbol: 2    # 每个品种允许的最大激活空间数量
+    allow_multiple_spaces_same_direction: true # 是否允许同向多个空间
+
+    # 空间失效条件
+    invalidate_on_opposite_extreme_touch: true
+    invalidate_on_max_duration: true
+    max_space_duration_hours: 48 # 空间最大持续小时数 (之前讨论72，暂定48)
+    invalidate_on_new_opposing_event: true
+
+    # 事件映射参数
+    # --- 主要目标品种，基于事件货币或类型 ---
+    primary_target_jpy_event: "USDJPY"
+    primary_target_gbp_event: "GBPUSD"
+    primary_target_eur_event: "EURUSD"
+    primary_target_usd_event: "EURUSD"  # 美元事件也主要看欧元/美元
+    primary_target_xau_event: "XAUUSD"  # 黄金事件
+    primary_target_cad_event: "USDCAD"  # 加拿大事件
+    primary_target_default_event: null  # 无明确规则匹配时的默认目标 (null 表示忽略)
+
+    # --- 识别特殊市场开盘事件的关键词 ---
+    market_open_event_keywords:
+      - "欧盘开盘"
+      - "欧股开盘"
+      - "美盘开盘"
+      - "美股开盘"
+
+    # --- 欧盘开盘事件的映射配置 ---
+    eur_market_open_primary_target: "EURUSD" # _map_event_to_symbol 返回此主要目标
+    eur_market_open_secondary_targets:       # 策略主循环需处理这些次要目标
+      - "GBPUSD"
+
+    # --- 美盘开盘事件的映射配置 ---
+    usa_market_open_primary_target: "XAUUSD"
+    usa_market_open_secondary_targets:
+      - "EURUSD"
+
+    # 点值大小 (Pip Size) 和缓冲区配置
+    # --- 默认点值大小 ---
+    default_pip_sizes:
+      is_jpy_pair: 0.01
+      is_fx_pair: 0.0001
+      is_metal_pair: 0.01
+
+    # --- 特定品种的点值大小 (覆盖默认值) ---
+    specific_pip_sizes:
+      "USDJPY": 0.01
+      "EURJPY": 0.01
+      "GBPJPY": 0.01
+      "AUDJPY": 0.01
+      "CHFJPY": 0.01 # 新增瑞郎日元
+      "EURUSD": 0.0001
+      "GBPUSD": 0.0001
+      "AUDUSD": 0.0001
+      "NZDUSD": 0.0001 # 新增纽元美元
+      "USDCAD": 0.0001
+      "USDCHF": 0.0001 # 新增美元瑞郎
+      "XAUUSD": 0.01    # 黄金
+      "XAGUSD": 0.001   # 白银
+
+    # --- 非外汇品种的绝对缓冲区大小 (覆盖 space_buffer_pips) ---
+    specific_absolute_buffers:
+      "SPXUSD_buffer_abs": 1.5    # 标普500指数
+      "NSDQUSD_buffer_abs": 2.5   # 纳斯达克指数
+      "UK100_buffer_abs": 4.0    # 富时100指数
+      "DE30_buffer_abs": 6.0     # 德国DAX30指数
+      "USOIL_buffer_abs": 0.05   # 美国原油
+      "Default_Index_buffer_abs": 3.0 # 其他未列出指数的默认绝对缓冲
+
+  # P1.1子策略配置
+  ReverseCrossoverStrategy:
+    magic_number: 67891
+    log_level: "INFO"
+    # 回调入场参数
+    entry_on_retrace: true  # 启用回调入场逻辑
+    wait_bars_max: 5        # 等待回调的最大K线数量
+    retrace_target_percent: 0.5  # 目标回调幅度(相对突破幅度的比例)
+
+  # P1.2子策略配置
+  ExhaustionStrategy:
+    magic_number: 67892
+    log_level: "INFO"
+    # 穷尽形态参数
+    min_pin_bar_ratio: 2.0  # Pin Bar最小影线与实体比例
+    engulfing_ratio: 1.2    # Engulfing形态要求的实体比例
+    confirmation_bars: 1    # 形态确认所需的额外K线数量
+
+  # P1.3子策略配置
+  KeyTimeWeightTurningPointStrategy:
+    magic_number: 67893
+    log_level: "INFO"
+    # 拐点参数
+    key_time_enabled: true  # 是否启用关键时间检测
+    key_time_hours_after_event: [1, 2, 4, 6, 12, 24]  # 事件后的关键小时点
+    # 拐点类型启用配置
+    use_natural_retracement_tp: true  # 启用自然回调拐点
+    natural_retracement_levels: [0.382, 0.5, 0.618]  # 斐波那契回调水平
+    use_node_tp: true  # 启用节点拐点
+    node_proximity_buffer_pips: 5  # 节点临近缓冲区大小(点)
+    # M5/M15确认参数
+    confirm_with_smaller_tf: true  # 是否用小时间框架确认
+    confirmation_tf_list: ["M5", "M15"]  # 用于确认的时间框架
+
+  # P1.4子策略配置
+  SpaceTimeResonanceStrategy:
+    magic_number: 67894
+    log_level: "INFO"
+    # 关键时间参数
+    key_time_enabled: true  # 是否启用关键时间检测
+    key_time_hours_after_event: [1, 2, 4, 8, 12, 24]  # 事件后的关键小时点
+    # 固定关键时间段配置
+    fixed_key_times:
+      - start: "08:00"  # 欧盘开盘
+        end: "09:00"
+        tz: "Europe/London"
+        days_of_week: [0, 1, 2, 3, 4]  # 周一至周五
+      - start: "14:30"  # 美盘开盘
+        end: "15:30"
+        tz: "America/New_York"
+        days_of_week: [0, 1, 2, 3, 4]  # 周一至周五
+    # S2情况处理参数
+    s2_max_wait_bars: 8  # S2情况等待价格返回空间的最大K线数量
+    # 内部检查器配置
+    use_rc_checker: true  # 使用反向突破检查器
+    use_ex_checker: true  # 使用穷尽检查器
+
+# Sandbox 执行引擎特定参数 (如果 execution_engine_type 设置为 sandbox)
+sandbox:
+  initial_cash: 100000
+  commission_per_trade: 0.0
+
+# 注意：共享的配置（如 MT5 连接、日志、路径）应从 common.yaml 继承 
